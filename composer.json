@@ -28,7 +28,7 @@
         "source": "https://github.com/anomalylabs/sitemap-extension"
     },
     "require": {
-        "anomaly/streams-platform": "^1.6",
+        "anomaly/streams-platform": "^2.0",
         "laravelium/sitemap": "^6.0"
     },
     "autoload": {
