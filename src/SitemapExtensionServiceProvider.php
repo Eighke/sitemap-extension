@@ -59,5 +59,4 @@ class SitemapExtensionServiceProvider extends AddonServiceProvider
             }
         );
     }
-
 }

@@ -15,9 +15,9 @@ use Laravelium\Sitemap\Sitemap;
 /**
  * Class SitemapController
  *
- * @link          http://pyrocms.com/
- * @author        PyroCMS, Inc. <support@pyrocms.com>
- * @author        Ryan Thompson <ryan@pyrocms.com>
+ * @link   http://pyrocms.com/
+ * @author PyroCMS, Inc. <support@pyrocms.com>
+ * @author Ryan Thompson <ryan@pyrocms.com>
  */
 class SitemapController extends PublicController
 {
@@ -44,7 +44,6 @@ class SitemapController extends PublicController
              * sitemaps for this addon.
              */
             foreach (config($addon->getNamespace('sitemap')) as $file => $configuration) {
-
                 if (is_string($configuration)) {
                     $configuration = [
                         'repository' => $configuration,
@@ -58,7 +57,7 @@ class SitemapController extends PublicController
                 }
 
                 /* @var EntryRepositoryInterface $repository */
-                $repository = $this->container->make($repository);
+                $repository = app($repository);
 
                 $lastmod = $repository
                     ->lastModified()// Grabs Entry
@@ -66,13 +65,13 @@ class SitemapController extends PublicController
                     ->toAtomString(); // Returns String
 
                 $sitemap->addSitemap(
-                    $this->url->to('sitemap/' . $addon->getNamespace() . '/' . $file . '.xml'),
+                    url('sitemap/' . $addon->getNamespace() . '/' . $file . '.xml'),
                     $lastmod
                 );
             }
         }
 
-        return $this->response->make(
+        return response(
             $sitemap->generate('sitemapindex')['content'],
             200,
             [
@@ -92,7 +91,7 @@ class SitemapController extends PublicController
      */
     public function view(Sitemap $sitemap, $addon, $file)
     {
-        $addon = $this->dispatchNow(new GetAddon($addon));
+        $addon = dispatch_now(new GetAddon($addon));
 
         $configuration = config($hint = $addon->getNamespace('sitemap.' . $file));
 
@@ -112,7 +111,7 @@ class SitemapController extends PublicController
         $ttl = array_get($configuration, 'ttl', 60 * 60);
 
         /* @var EntryRepositoryInterface|Hookable $repository */
-        $repository = $this->container->make($repository);
+        $repository = app($repository);
 
         /**
          * Cache everything using the repository.
@@ -140,7 +139,6 @@ class SitemapController extends PublicController
 
                 /* @var EntryInterface $entry */
                 foreach ($repository->call('get_sitemap') as $entry) {
-
                     $images       = []; // @todo Make this around hookable.
                     $translations = [];
 
@@ -149,11 +147,8 @@ class SitemapController extends PublicController
                         ->toAtomString();
 
                     if ($translatable) {
-
-
                         foreach ($locales as $locale) {
                             if ($locale != $default) {
-
                                 $translations[] = [
                                     'language' => $locale,
                                     'url'      => $entry->route('view'),
@@ -184,7 +179,7 @@ class SitemapController extends PublicController
             }
         );
 
-        return $this->response->make(
+        return response(
             $sitemap,
             200,
             [
